@@ -147,12 +147,16 @@ def make_app(bus: EventBus, fsm: FSM, radio) -> FastAPI:
     @app.get("/events")
     async def sse(req: Request):
         async def gen():
-            # send initial
-            yield f"event: state\ndata: {json.dumps(fsm.state.to_dict())}\n\n"
-            async for ev in bus.subscribe():
-                if await req.is_disconnected():
-                    break
-                yield f"event: {ev.get('type','state')}\ndata: {json.dumps(ev.get('data'))}\n\n"
+            try:
+                yield f"event: state\ndata: {json.dumps(fsm.state.to_dict())}\n\n"
+                async for ev in bus.subscribe():
+                    if await req.is_disconnected():
+                        break
+                    yield f"event: {ev.get('type','state')}\ndata: {json.dumps(ev.get('data'))}\n\n"
+            except asyncio.CancelledError:
+                return
+            except Exception:
+                return
         return StreamingResponse(gen(), media_type="text/event-stream")
 
     return app
