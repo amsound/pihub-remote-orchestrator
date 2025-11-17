@@ -27,7 +27,9 @@ async def main() -> None:
     kef = KEFAdapter(host=os.environ.get("KEF_HOST"))
     ma  = MusicAssistant(server_url=os.environ.get("MA_URL","http://127.0.0.1:8095"))
     tv  = SamsungTVMonitor(os.environ.get("TV_HOST","192.168.1.50"))
-    bt  = BTLEController()
+    adapter = os.environ.get("BT_ADAPTER", "hci0")
+    device_name = os.environ.get("BT_DEVICE_NAME", "PiHub HID")
+    bt = BTLEController(adapter=adapter, device_name=device_name)
     macros = AppleTVMacros(bt)
 
     webhook = WebhookClient(os.environ.get("HA_WEBHOOK_URL"))
@@ -51,6 +53,10 @@ async def main() -> None:
         await kef.poll_loop()
     async def task_ma():
         await ma.connect()
+        # resolve preferred MA player (ID wins, falls back to name if provided)
+        player_hint = os.environ.get("MA_PLAYER_ID") or os.environ.get("MA_PLAYER")
+        if player_hint:
+            await ma.ensure_player(player_hint)
     async def task_radio_refresh():
         # Boot refresh + weekly 03:00 Europe/London
         stations = await ma.fetch_radio_catalog()
