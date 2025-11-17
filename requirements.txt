@@ -1,0 +1,14 @@
+bluez_peripheral==0.2.0a4
+dbus-fast==2.44.3
+evdev==1.9.2
+PyYAML==6.0.2
+uvloop==0.21.0
+aiohttp>=3.9,<4
+fastapi>=0.115.0,<1
+uvicorn>=0.30,<1
+httpx>=0.27,<1
+websockets>=12,<13
+aiosqlite>=0.20,<1
+pydantic>=2.6,<3
+aiokef>=0.2.17
+music-assistant-client>=1.2.4
