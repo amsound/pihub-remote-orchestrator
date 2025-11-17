@@ -1,6 +1,7 @@
 
 from __future__ import annotations
 import asyncio
+import contextlib
 from typing import Any, AsyncIterator, Dict, List, Optional
 
 class EventBus:
