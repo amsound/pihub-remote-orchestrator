@@ -55,9 +55,15 @@ class SimKEF(KEFBackend):
         return
 
 class KEFAdapter:
-    def __init__(self, backend: Optional[KEFBackend] = None) -> None:
-        self._backend = backend or SimKEF()
+    def __init__(self, host: str | None = None, backend: Optional[KEFBackend] = None) -> None:
+        if backend:
+            self._backend = backend
+        else:
+            if not host:
+                raise RuntimeError("KEF host must be provided")
+            self._backend = AiokefBackend(host)
         self.on_change: Optional[Callable[[KEFSnapshot], Awaitable[None]]] = None
+
 
     async def poll_loop(self, interval: float = 0.5) -> None:
         last: Optional[KEFSnapshot] = None
